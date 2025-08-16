@@ -1,46 +1,40 @@
-name: Build, Push Docker Image and Deploy to Render
+# Nombre del flujo de trabajo
+name: Build and Deploy to Docker Hub and Render
 
+# Se ejecuta en el evento 'push' a la rama 'main'
 on:
   push:
     branches:
       - main
 
+# Define los 'jobs' (tareas) que se ejecutarán
 jobs:
   build-and-deploy:
+    # Ejecuta este trabajo en un sistema operativo Ubuntu
     runs-on: ubuntu-latest
-
+    # Pasos del trabajo
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      # Paso 1: Checkout del código del repositorio
+      - name: Checkout Repository
+        uses: actions/checkout@v3
 
-      - name: Set up variables
-        id: vars
-        run: |
-          echo "SHA_SHORT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          echo "DATE=$(date +'%Y%m%d')" >> $GITHUB_ENV
-
-      - name: Log in to Docker Hub
-        uses: docker/login-action@v3
+      # Paso 2: Iniciar sesión en Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
         with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+          username: ${{ secrets.DOCKER_HUB_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
-      - name: Build Docker image with tags
-        run: |
-          docker build -t ${{ secrets.DOCKER_USERNAME }}/miapp:latest \
-                       -t ${{ secrets.DOCKER_USERNAME }}/miapp:${{ env.SHA_SHORT }} \
-                       -t ${{ secrets.DOCKER_USERNAME }}/miapp:${{ env.DATE }} .
+      # Paso 3: Construir y etiquetar la imagen Docker
+      - name: Build and tag Docker image
+        run: docker build -t ${{ secrets.DOCKER_HUB_USERNAME }}/hola-mundo-app .
 
-      - name: Push Docker images
-        run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/miapp:latest
-          docker push ${{ secrets.DOCKER_USERNAME }}/miapp:${{ env.SHA_SHORT }}
-          docker push ${{ secrets.DOCKER_USERNAME }}/miapp:${{ env.DATE }}
+      # Paso 4: Empujar la imagen a Docker Hub
+      - name: Push Docker image
+        run: docker push ${{ secrets.DOCKER_HUB_USERNAME }}/hola-mundo-app
 
-      - name: Trigger Render deploy
-        run: |
-          curl -X POST https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
-            -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
-            -H "Content-Type: application/json"
+      # Paso 5: Desplegar en Render.com
+      # Este es un ejemplo conceptual. Render.com típicamente usa un webhook o una integración nativa.
+      # Reemplaza la URL del webhook con la de tu servicio en Render.
       - name: Trigger Render.com deploy
         run: curl ${{ secrets.RENDER_DEPLOY_WEBHOOK_URL }}
