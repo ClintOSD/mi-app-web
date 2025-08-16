@@ -8,7 +8,7 @@ app = Flask(__name__)
 @app.route('/')
 def hello_world():
     # Retorna el mensaje "¡Hola, Mundo!"
-    return '¡Hola, Mundo!'
+    return 'Un gran saludo, espero estes pasando un excelente dia'
 
 # Este bloque se ejecuta solo si el script se corre directamente
 if __name__ == '__main__':
