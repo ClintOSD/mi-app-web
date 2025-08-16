@@ -31,7 +31,7 @@ jobs:
     steps:
     - name: Trigger Render Deployment
       run: |
-        curl -X POST https://api.render.com/v1/services/${{ secrets.RENDER_SERVICE_ID }}/deploys \
+        curl -X POST https://mi-app-web-lms9.onrender.com/${{ secrets.RENDER_SERVICE_ID }}/deploys \
         -H "Accept: application/json" \
         -H "Authorization: Bearer ${{ secrets.RENDER_API_KEY }}" \
         -d '{}'
